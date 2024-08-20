@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PACKAGE="${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_PACKAGE}"
+
+if [[ "${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_REGISTRY}" =~ "/" ]]; then
+  ORGANIZATION_SLUG="${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_REGISTRY%/*}"
+else
+  ORGANIZATION_SLUG="${BUILDKITE_ORGANIZATION_SLUG}"
+fi
+
+REGISTRY_SLUG="${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_REGISTRY#*/}"
+
+echo "--- Downloading artifacts"
+buildkite-agent artifact download "${PACKAGE}" .
+
+echo "--- Requesting OIDC token"
+TOKEN="$(buildkite-agent oidc request-token --audience "https://packages.buildkite.com/${ORGANIZATION_SLUG}/${REGISTRY_SLUG}" --lifetime 300)"
+
+echo "--- Pushing to Buildkite Packages"
+declare -a PATTERN="($PACKAGE)" # expand glob
+for FILE in "${PATTERN[@]}"; do
+  curl --fail -X POST "https://api.buildkite.com/v2/packages/organizations/${ORGANIZATION_SLUG}/registries/${REGISTRY_SLUG}/packages" \
+    -H "Authorization: Bearer $TOKEN" \
+    -F "file=@$FILE"
+done
