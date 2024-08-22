@@ -1,14 +1,15 @@
-name: Buildkite Plugin
-description: Exceptional functionality
+name: Publish to Packages
+description: Publish packages to Buildkite Packages
 author: https://github.com/buildkite-plugins
 requirements:
   - bash
 configuration:
   properties:
-    mandatory:
+    files:
       type: string
-    optional:
+    registry:
       type: string
   required:
-    - mandatory
+    - files
+    - registry
   additionalProperties: false
