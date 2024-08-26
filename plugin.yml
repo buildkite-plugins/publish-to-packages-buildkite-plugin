@@ -5,11 +5,11 @@ requirements:
   - bash
 configuration:
   properties:
-    files:
+    artifacts:
       type: string
     registry:
       type: string
   required:
-    - files
+    - artifacts
     - registry
   additionalProperties: false
