@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-set -xeuo pipefail
+
+# `set -x` if DEBUG_SCRIPT is set to anything at all
+if [[ -n "${DEBUG_SCRIPT}" ]]; then
+  set -x
+fi
+
+set -euo pipefail
 
 DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
@@ -26,7 +32,7 @@ TOKEN="$(buildkite-agent oidc request-token --audience "https://packages.buildki
 echo "--- Publish to Buildkite Packages"
 declare -a UNGLOBBED_FILES="($ARTIFACTS)" # expand glob
 for FILE in "${UNGLOBBED_FILES[@]}"; do
-  curl --fail -X POST "https://api.buildkite.com/v2/packages/organizations/${ORGANIZATION_SLUG}/registries/${REGISTRY_SLUG}/packages" \
+  curl --fail-with-body -X POST "https://api.buildkite.com/v2/packages/organizations/${ORGANIZATION_SLUG}/registries/${REGISTRY_SLUG}/packages" \
     -H "Authorization: Bearer $TOKEN" \
     -F "file=@$FILE"
 done
