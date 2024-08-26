@@ -28,12 +28,14 @@ Show how your plugin is to be used
 ```yaml
 steps:
   - name: "Build Gem"
+    key: "build-gem"
     command: "gem build awesome-logger.gemspec"
     artifact_paths: "awesome-logger-*.gem" # upload to build artifact storage
 
   - name: "Publish Gem"
+    depends_on: "build-gem"
     plugins:
       - buildkite-plugin/publish-to-packages#main:
-          artifacts: awesome-logger-*.gem # publish from build artifact storage
-          registry: acme-corp/awesome-logger
+          artifacts: "awesome-logger-*.gem" # publish from build artifact storage
+          registry: "acme-corp/awesome-logger"
 ```
