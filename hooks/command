@@ -11,10 +11,10 @@ set -e            # Immediately exit if any command has a non-zero exit status
 set -u            # Immediately exit if a reference is made to an unbound variable
 set -o pipefail   # Pipeline ("|") uses exit status of the first failed command
 
-DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 # shellcheck source=lib/plugin.bash
-. "$DIR/../lib/plugin.bash"
+. "$SCRIPT_DIR/../lib/plugin.bash"
 
 ARTIFACTS="$(plugin_read_config ARTIFACTS "")"
 REGISTRY="$(plugin_read_config REGISTRY "")"

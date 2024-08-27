@@ -6,15 +6,11 @@ This plugin authenticates with Buildkite Packages using an [Agent OIDC token](ht
 
 ## Options
 
-These are all the options available to configure this plugin's behaviour.
-
-### Required
-
-#### `artifacts` (string)
+#### `artifacts` (string, required)
 
 A glob pattern for artifacts to publish to Buildkite Packages from [Build artifacts](https://buildkite.com/docs/pipelines/artifacts).
 
-#### `registry` (string)
+#### `registry` (string, required)
 
 Buildkite Packages registry to publish to.
 
