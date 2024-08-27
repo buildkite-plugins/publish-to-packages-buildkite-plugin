@@ -21,9 +21,13 @@ Buildkite Packages registry to publish to.
 - Full format is `<organization>/<registry_name>` (e.g. `acme-corp/awesome-logger`).
 - `<organization>` defaults to your Buildkite organization if omitted (e.g. `awesome-logger`).
 
-## Examples
+## Example
 
-Show how your plugin is to be used
+In the example below, _Build Gem_ step builds and uploads `awesome-logger-*.gem` package to the build artifact storage.
+
+_Publish Gem_ step uses Publish to Packages to publish the package from the build artifact storage to **acme-corp/awesome-logger** Packages registry.
+
+Globbing (`awesome-logger-*.gem`) is a good way to accommodate version changes/increments (e.g. `awesome-logger-1.0.5.gem`).
 
 ```yaml
 steps:
