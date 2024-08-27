@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-# `set -x` if DEBUG_SCRIPT is set to anything at all
+# `set -x` if DEBUG_SCRIPT environment variable is set 
+# to anything at all. e.g. DEBUG_SCRIPT=1
 if [[ -n "${DEBUG_SCRIPT}" ]]; then
-  set -x
+  set -x # print all executed commands to the terminal
 fi
 
 set -euo pipefail
