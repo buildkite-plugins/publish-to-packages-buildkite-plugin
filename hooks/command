@@ -1,26 +1,42 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-PACKAGE="${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_PACKAGE}"
+# `set -x` if DEBUG_PUBLISH_TO_PACKAGES environment variable is set 
+# to anything at all. e.g. DEBUG_PUBLISH_TO_PACKAGES=1
+# Do this before `set -u` to avoid unbound variable error.
+if [[ -n "${DEBUG_PUBLISH_TO_PACKAGES}" ]]; then
+  set -x # Print all executed commands to the terminal for debugging
+fi
 
-if [[ "${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_REGISTRY}" =~ "/" ]]; then
-  ORGANIZATION_SLUG="${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_REGISTRY%/*}"
+set -e            # Immediately exit if any command has a non-zero exit status
+set -u            # Immediately exit if a reference is made to an unbound variable
+set -o pipefail   # Pipeline ("|") uses exit status of the first failed command
+
+SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+
+# shellcheck source=lib/plugin.bash
+. "$SCRIPT_DIR/../lib/plugin.bash"
+
+ARTIFACTS="$(plugin_read_config ARTIFACTS "")"
+REGISTRY="$(plugin_read_config REGISTRY "")"
+
+if [[ "${REGISTRY}" =~ "/" ]]; then
+  ORGANIZATION_SLUG="${REGISTRY%/*}"
 else
   ORGANIZATION_SLUG="${BUILDKITE_ORGANIZATION_SLUG}"
 fi
 
-REGISTRY_SLUG="${BUILDKITE_PLUGIN_PUBLISH_PACKAGE_REGISTRY#*/}"
+REGISTRY_SLUG="${REGISTRY#*/}"
 
-echo "--- Downloading artifacts"
-buildkite-agent artifact download "${PACKAGE}" .
+echo "--- Download artifacts"
+buildkite-agent artifact download "${ARTIFACTS}" .
 
-echo "--- Requesting OIDC token"
+echo "--- Request OIDC token"
 TOKEN="$(buildkite-agent oidc request-token --audience "https://packages.buildkite.com/${ORGANIZATION_SLUG}/${REGISTRY_SLUG}" --lifetime 300)"
 
-echo "--- Pushing to Buildkite Packages"
-declare -a PATTERN="($PACKAGE)" # expand glob
-for FILE in "${PATTERN[@]}"; do
-  curl --fail -X POST "https://api.buildkite.com/v2/packages/organizations/${ORGANIZATION_SLUG}/registries/${REGISTRY_SLUG}/packages" \
+echo "--- Publish to Buildkite Packages"
+declare -a UNGLOBBED_FILES="($ARTIFACTS)" # expand glob
+for FILE in "${UNGLOBBED_FILES[@]}"; do
+  curl --fail-with-body -X POST "https://api.buildkite.com/v2/packages/organizations/${ORGANIZATION_SLUG}/registries/${REGISTRY_SLUG}/packages" \
     -H "Authorization: Bearer $TOKEN" \
     -F "file=@$FILE"
 done

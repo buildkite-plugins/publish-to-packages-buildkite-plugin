@@ -1,0 +1,15 @@
+name: Publish to Packages
+description: Publish packages to Buildkite Packages
+author: https://github.com/buildkite-plugins
+requirements:
+  - bash
+configuration:
+  properties:
+    artifacts:
+      type: string
+    registry:
+      type: string
+  required:
+    - artifacts
+    - registry
+  additionalProperties: false
