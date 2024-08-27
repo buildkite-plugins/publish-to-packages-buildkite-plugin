@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# `set -x` if DEBUG_SCRIPT environment variable is set 
-# to anything at all. e.g. DEBUG_SCRIPT=1
-if [[ -n "${DEBUG_SCRIPT}" ]]; then
+# `set -x` if DEBUG_PUBLISH_TO_PACKAGES environment variable is set 
+# to anything at all. e.g. DEBUG_PUBLISH_TO_PACKAGES=1
+if [[ -n "${DEBUG_PUBLISH_TO_PACKAGES}" ]]; then
   set -x # print all executed commands to the terminal
 fi
 
