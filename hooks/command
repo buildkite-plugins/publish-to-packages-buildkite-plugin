@@ -2,11 +2,14 @@
 
 # `set -x` if DEBUG_PUBLISH_TO_PACKAGES environment variable is set 
 # to anything at all. e.g. DEBUG_PUBLISH_TO_PACKAGES=1
+# Do this before `set -u` to avoid unbound variable error.
 if [[ -n "${DEBUG_PUBLISH_TO_PACKAGES}" ]]; then
-  set -x # print all executed commands to the terminal
+  set -x # Print all executed commands to the terminal for debugging
 fi
 
-set -euo pipefail
+set -e            # Immediately exit if any command has a non-zero exit status
+set -u            # Immediately exit if a reference is made to an unbound variable
+set -o pipefail   # Pipeline ("|") uses exit status of the first failed command
 
 DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
