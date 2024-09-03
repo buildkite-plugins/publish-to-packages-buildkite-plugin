@@ -19,11 +19,11 @@ Buildkite Packages registry to publish to.
 
 #### `artifact_build_id` (string, optional)
 
-Configures the plugin to download artifacts from the build referenced by the UUID specified here.
+Configures the plugin to download artifacts from a different build, referenced by its UUID.
 
 When this option is not specified, the plugin defaults to downloading artifacts from the build that it is running in.
 
-This is typically used when a "Publish Package" pipeline build is triggered by a "Build Package" pipeline build where the artifacts are built and stored. See _Building and publishing from different pipelines_ example below.
+This is typically used when package building and package publishing are split across two different pipelines and the former triggers the latter. See _Building and publishing from different pipelines_ example below.
 
 ## Usage
 
@@ -59,7 +59,7 @@ There are two pipelines in this example:
 
 _Build Package_ pipeline builds a gem, uploads it to its artifact storage and triggers the _Publish Package_ pipeline to publish the package.
 
-In _Publish Packages_ pipeline, the `artifact_build_id` option is specified to reference the build that triggered it. This configures the plugin to download artifacts from the _Build Package_ build that triggered it.
+In _Publish Packages_ pipeline, the `artifact_build_id` option is specified to reference [the build that triggered it](https://buildkite.com/docs/pipelines/environment-variables#BUILDKITE_TRIGGERED_FROM_BUILD_ID). This configures the plugin to download artifacts from the _Build Package_ build that triggered it.
 
 ```yaml
 # build.pipeline.yml
