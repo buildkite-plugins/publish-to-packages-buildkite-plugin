@@ -18,6 +18,7 @@ SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 ARTIFACTS="$(plugin_read_config ARTIFACTS "")"
 REGISTRY="$(plugin_read_config REGISTRY "")"
+ARTIFACT_BUILD_ID="$(plugin_read_config ARTIFACT_BUILD_ID "")"
 
 if [[ "${REGISTRY}" =~ "/" ]]; then
   ORGANIZATION_SLUG="${REGISTRY%/*}"
@@ -28,7 +29,12 @@ fi
 REGISTRY_SLUG="${REGISTRY#*/}"
 
 echo "--- Download artifacts"
-buildkite-agent artifact download "${ARTIFACTS}" .
+
+if [ "${ARTIFACT_BUILD_ID}" != "" ]; then
+  buildkite-agent artifact download "${ARTIFACTS}" . --build "${ARTIFACT_BUILD_ID}"
+else
+  buildkite-agent artifact download "${ARTIFACTS}" .
+fi
 
 echo "--- Request OIDC token"
 TOKEN="$(buildkite-agent oidc request-token --audience "https://packages.buildkite.com/${ORGANIZATION_SLUG}/${REGISTRY_SLUG}" --lifetime 300)"
