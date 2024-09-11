@@ -1,0 +1,24 @@
+steps:
+  - label: ":python: Type check"
+    command: "mypy --strict **/*.py"
+    plugins:
+      - docker#v5.11.0:
+          image: "cytopia/mypy:latest-py3.10"
+
+  - label: ":python: Unit tests"
+    command: "python3 -m unittest tests/*.py"
+    plugins:
+      - docker#v5.11.0:
+          image: "cytopia/mypy:latest-py3.10"
+
+  - label: ":sparkles: Lint"
+    plugins:
+      - plugin-linter#v3.3.0:
+          id: publish-to-packages
+
+  - label: ":shell: Shellcheck"
+    plugins:
+      - shellcheck#v1.3.0:
+          files:
+            - hooks/**
+            - lib/**
