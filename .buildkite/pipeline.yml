@@ -1,9 +1,6 @@
 steps:
   - label: ":python: Type check"
-    plugins:
-      - docker#v5.11.0:
-          image: "cytopia/mypy:latest-py3.10"
-          command: "mypy --strict **/*.py"
+    command: "docker run --rm -v $(pwd):/data cytopia/mypy:latest-py3.10 --strict **/*.py"
 
   - label: ":python: Unit tests"
     plugins:
