@@ -3,13 +3,13 @@ steps:
     plugins:
       - docker#v5.11.0:
           image: "cytopia/mypy:latest-py3.10"
-          command: ["mypy", "--strict", "**/*.py"]
+          command: "mypy --strict **/*.py"
 
   - label: ":python: Unit tests"
     plugins:
       - docker#v5.11.0:
           image: "cytopia/mypy:latest-py3.10"
-          command: ["python3", "-m", "unittest", "tests/*.py"]
+          command: "python3 -m unittest tests/*.py"
 
   - label: ":sparkles: Lint"
     plugins:
