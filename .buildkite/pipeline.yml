@@ -1,13 +1,18 @@
 steps:
   - label: ":python: Type check"
-    command: "docker run --rm -v $(pwd):/data cytopia/mypy:latest-py3.10 --strict **/*.py"
+    command: "mypy --strict ."
+    plugins:
+      - docker#v5.11.0:
+          image: "cytopia/mypy:latest-py3.10" # https://hub.docker.com/r/cytopia/mypy
+          workdir: "/data" # Expected by image: https://github.com/cytopia/docker-mypy/blob/f33fba854ea69a4fd102a044242c2a3c8efac6e3/Dockerfiles/Dockerfile.python3.10#L50
+          entrypoint: "" # Override: https://github.com/cytopia/docker-mypy/blob/f33fba854ea69a4fd102a044242c2a3c8efac6e3/Dockerfiles/Dockerfile.python3.10#L51
+          shell: ["/bin/sh", "-e", "-c"] # Restore default from setting `entrypoint:` above.
 
   - label: ":python: Unit tests"
     command: "python3 -m unittest tests/*.py"
     plugins:
       - docker#v5.11.0:
           image: "python:3.10-alpine"
-
   - label: ":sparkles: Lint"
     plugins:
       - plugin-linter#v3.3.0:
