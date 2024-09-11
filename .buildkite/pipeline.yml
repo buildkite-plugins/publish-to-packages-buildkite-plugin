@@ -3,10 +3,10 @@ steps:
     command: "docker run --rm -v $(pwd):/data cytopia/mypy:latest-py3.10 --strict **/*.py"
 
   - label: ":python: Unit tests"
+    command: "python3 -m unittest tests/*.py"
     plugins:
       - docker#v5.11.0:
-          image: "cytopia/mypy:latest-py3.10"
-          command: "python3 -m unittest tests/*.py"
+          image: "python:3.10-alpine"
 
   - label: ":sparkles: Lint"
     plugins:
