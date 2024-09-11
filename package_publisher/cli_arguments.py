@@ -10,7 +10,7 @@ class CliArguments:
             epilog="Have a nice day!",
         )
         parser.add_argument("--registry", default="")
-        parser.add_argument("--artifacts-glob", default="")
+        parser.add_argument("--artifacts-dir", default="")
         parser.add_argument("--provenance-bundle", default="")
 
         self.arguments = parser.parse_args()
@@ -21,8 +21,8 @@ class CliArguments:
             registry = "{}/{}".format(self.organization_slug, registry)
         return registry
 
-    def get_artifacts_glob(self) -> str:
-        return str(self.arguments.artifacts_glob).strip()
+    def get_artifacts_dir(self) -> str:
+        return str(self.arguments.artifacts_dir).strip()
 
     def get_provenance_bundle(self) -> str:
         return str(self.arguments.provenance_bundle).strip()

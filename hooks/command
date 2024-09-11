@@ -27,7 +27,7 @@ PROVENANCE_DIR="${TMP_DIR}/provenance"
 
 mkdir -p "${ARTIFACTS_DIR}" "${PROVENANCE_DIR}"
 
-echo "--- Download artifacts"
+echo "~~~ 🚚 Download artifacts"
 
 if [ "${ARTIFACT_BUILD_ID}" != "" ]; then
   BUILD_OPTION="--build ${ARTIFACT_BUILD_ID}"
@@ -42,7 +42,7 @@ if [ "${PROVENANCE_BUNDLE}" != "" ]; then
   buildkite-agent artifact download ${PROVENANCE_BUNDLE} ${PROVENANCE_DIR} ${BUILD_OPTION}
 fi
 
-echo "--- Publishing Packages"
+echo "+++ 🚚 Publishing to Packages"
 
 if [ "${PROVENANCE_BUNDLE}" != "" ]; then
   PROVENANCE_BUNDLE_PATH="${PROVENANCE_DIR}/${PROVENANCE_BUNDLE}"
@@ -51,10 +51,10 @@ else
 fi
 
 python3 "${SCRIPT_DIR}/../main.py" \
-  --artifacts-glob "${ARTIFACTS_DIR}/**/*" \
+  --artifacts-dir "${ARTIFACTS_DIR}" \
   --registry "${REGISTRY}" \
   --provenance-bundle "${PROVENANCE_BUNDLE_PATH}" 
 
-echo "~~~ Clean up Publish to Packages"
+echo "~~~ 🚚 Clean up Publish to Packages"
 
 rm -rf ${TMP_DIR}

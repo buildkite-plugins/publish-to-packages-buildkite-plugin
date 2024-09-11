@@ -11,26 +11,21 @@ arguments = CliArguments(organization_slug=environment["BUILDKITE_ORGANIZATION_S
 
 publisher = PackagePublisher(registry=arguments.get_registry())
 
-files = [
-    path
-    for path in glob(arguments.get_artifacts_glob(), recursive=True)
-    if os.path.isfile(path)
-]
+artifacts_dir = arguments.get_artifacts_dir()
+artifacts_glob = glob("{}/**/*".format(artifacts_dir), recursive=True)
+files = [path for path in artifacts_glob if os.path.isfile(path)]
 
 for file in files:
-    print("Uploading {} to {}".format(file, arguments.get_registry()))
+    print(
+        "Publishing {} → {}".format(
+            file.replace("{}/".format(artifacts_dir), ""), arguments.get_registry()
+        )
+    )
 
     response = publisher.upload_package(
         file_path=file,
         provenance_bundle_path=arguments.get_provenance_bundle(),
     )
 
-    print(
-        "⬆️ Uploaded {} to {}/{}".format(
-            file.split("/")[-1],
-            response["organization"]["slug"],
-            response["registry"]["slug"],
-        )
-    )
-    print("  \033]1339;url={}\a".format(response["web_url"]))
+    print(" ✅ \033]1339;url={}\a".format(response["web_url"]))
     print("")
