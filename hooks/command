@@ -36,9 +36,11 @@ else
 fi
 
 # Very important not to quote ${BUILD_OPTION} as it messes with the --option parsing
+# shellcheck disable=SC2086
 buildkite-agent artifact download ${ARTIFACTS} ${ARTIFACTS_DIR} ${BUILD_OPTION}
 
 if [ "${PROVENANCE_BUNDLE}" != "" ]; then
+  # shellcheck disable=SC2086
   buildkite-agent artifact download ${PROVENANCE_BUNDLE} ${PROVENANCE_DIR} ${BUILD_OPTION}
 fi
 
@@ -57,4 +59,4 @@ python3 "${SCRIPT_DIR}/../main.py" \
 
 echo "~~~ 🚚 Clean up Publish to Packages"
 
-rm -rf ${TMP_DIR}
+rm -rf "${TMP_DIR}"

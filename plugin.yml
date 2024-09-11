@@ -9,6 +9,8 @@ configuration:
       type: string
     registry:
       type: string
+    artifact_build_id:
+      type: string
   required:
     - artifacts
     - registry

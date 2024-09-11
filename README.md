@@ -45,7 +45,7 @@ steps:
   - label: "Publish Gem"
     depends_on: "build-gem"
     plugins:
-      - buildkite-plugins/publish-to-packages#main:
+      - publish-to-packages#v2.0.0:
           artifacts: "awesome-logger-*.gem" # publish from build artifact storage
           registry: "acme-corp/awesome-logger"
 ```
@@ -85,7 +85,7 @@ steps:
 steps:
   - label: "Publish Gem"
     plugins:
-      - buildkite-plugins/publish-to-packages#main:
+      - publish-to-packages#v2.0.0:
           artifacts: "awesome-logger-*.gem"
           registry: "acme-corp/awesome-logger"
           artifact_build_id: "${BUILDKITE_TRIGGERED_FROM_BUILD_ID}"
