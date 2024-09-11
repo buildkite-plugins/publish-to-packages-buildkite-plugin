@@ -19,30 +19,45 @@ SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 ARTIFACTS="$(plugin_read_config ARTIFACTS "")"
 REGISTRY="$(plugin_read_config REGISTRY "")"
 ARTIFACT_BUILD_ID="$(plugin_read_config ARTIFACT_BUILD_ID "")"
+PROVENANCE_BUNDLE="$(plugin_read_config PROVENANCE_BUNDLE "")"
 
-if [[ "${REGISTRY}" =~ "/" ]]; then
-  ORGANIZATION_SLUG="${REGISTRY%/*}"
-else
-  ORGANIZATION_SLUG="${BUILDKITE_ORGANIZATION_SLUG}"
-fi
+TMP_DIR=$(mktemp -d)
+ARTIFACTS_DIR="${TMP_DIR}/artifacts"
+PROVENANCE_DIR="${TMP_DIR}/provenance"
 
-REGISTRY_SLUG="${REGISTRY#*/}"
+mkdir -p "${ARTIFACTS_DIR}" "${PROVENANCE_DIR}"
 
-echo "--- Download artifacts"
+echo "~~~ 🚚 Download artifacts"
 
 if [ "${ARTIFACT_BUILD_ID}" != "" ]; then
-  buildkite-agent artifact download "${ARTIFACTS}" . --build "${ARTIFACT_BUILD_ID}"
+  BUILD_OPTION="--build ${ARTIFACT_BUILD_ID}"
 else
-  buildkite-agent artifact download "${ARTIFACTS}" .
+  BUILD_OPTION=""
 fi
 
-echo "--- Request OIDC token"
-TOKEN="$(buildkite-agent oidc request-token --audience "https://packages.buildkite.com/${ORGANIZATION_SLUG}/${REGISTRY_SLUG}" --lifetime 300)"
+# Very important not to quote ${BUILD_OPTION} as it messes with the --option parsing
+# shellcheck disable=SC2086
+buildkite-agent artifact download ${ARTIFACTS} ${ARTIFACTS_DIR} ${BUILD_OPTION}
 
-echo "--- Publish to Buildkite Packages"
-declare -a UNGLOBBED_FILES="($ARTIFACTS)" # expand glob
-for FILE in "${UNGLOBBED_FILES[@]}"; do
-  curl --fail-with-body -X POST "https://api.buildkite.com/v2/packages/organizations/${ORGANIZATION_SLUG}/registries/${REGISTRY_SLUG}/packages" \
-    -H "Authorization: Bearer $TOKEN" \
-    -F "file=@$FILE"
-done
+if [ "${PROVENANCE_BUNDLE}" != "" ]; then
+  # shellcheck disable=SC2086
+  buildkite-agent artifact download ${PROVENANCE_BUNDLE} ${PROVENANCE_DIR} ${BUILD_OPTION}
+fi
+
+echo "+++ 🚚 Publishing to Packages"
+
+if [ "${PROVENANCE_BUNDLE}" != "" ]; then
+  PROVENANCE_BUNDLE_PATH="${PROVENANCE_DIR}/${PROVENANCE_BUNDLE}"
+else
+  PROVENANCE_BUNDLE_PATH=""
+fi
+
+python3 "${SCRIPT_DIR}/../main.py" \
+  --artifacts-dir "${ARTIFACTS_DIR}" \
+  --registry "${REGISTRY}" \
+  --provenance-bundle "${PROVENANCE_BUNDLE_PATH}" \
+  --organization-slug "${BUILDKITE_ORGANIZATION_SLUG}"
+
+echo "~~~ 🚚 Clean up Publish to Packages"
+
+rm -rf "${TMP_DIR}"
