@@ -3,11 +3,8 @@ from glob import glob
 
 from package_publisher.cli_arguments import CliArguments
 from package_publisher.core import PackagePublisher
-from package_publisher.helpers import fake_env
 
-environment = fake_env() if os.environ.get("FAKE_ENV") == "1" else os.environ
-
-arguments = CliArguments(organization_slug=environment["BUILDKITE_ORGANIZATION_SLUG"])
+arguments = CliArguments()
 
 publisher = PackagePublisher(registry=arguments.get_registry())
 

@@ -2,7 +2,8 @@ name: Publish to Packages
 description: Publish packages to Buildkite Packages
 author: https://github.com/buildkite-plugins
 requirements:
-  - bash
+  - python3
+  - curl
 configuration:
   properties:
     artifacts:
