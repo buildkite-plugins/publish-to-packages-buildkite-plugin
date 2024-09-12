@@ -60,7 +60,7 @@ class PackagePublisherTests(unittest.TestCase):
 
         pp = PackagePublisher(registry="acme-corp/awesome-gem")
 
-        pp.upload_package(file_path="/example/file.gem", provenance_bundle_path="")
+        pp.upload_package(file_path="/example/file.gem")
 
         mock_subprocess.run.assert_called_with(
             [
@@ -79,7 +79,7 @@ class PackagePublisherTests(unittest.TestCase):
         )
 
     @patch("package_publisher.core.subprocess")
-    def test_upload_package_shells_out_correctly_with_provenance_path(
+    def test_upload_package_shells_out_correctly_when_attestation_bundle_path_is_set(
         self, mock_subprocess: Mock
     ) -> None:
         mock_subprocess.return_value = Mock(name="subprocess")
@@ -94,12 +94,12 @@ class PackagePublisherTests(unittest.TestCase):
 
         mock_subprocess.run.side_effect = mock_run
 
-        pp = PackagePublisher(registry="acme-corp/awesome-gem")
-
-        pp.upload_package(
-            file_path="/example/file.gem",
-            provenance_bundle_path="/example/provenance.json",
+        pp = PackagePublisher(
+            registry="acme-corp/awesome-gem",
+            attestation_bundle_path="/path/to/attestation_bundle.jsonl",
         )
+
+        pp.upload_package(file_path="/example/file.gem")
 
         mock_subprocess.run.assert_called_with(
             [
@@ -111,7 +111,7 @@ class PackagePublisherTests(unittest.TestCase):
                 "--form",
                 "file=@/example/file.gem",
                 "--form",
-                "provenance_bundle=@/example/provenance.json",
+                "attestation_bundle=@/path/to/attestation_bundle.jsonl",
                 "https://api.buildkite.com/v2/packages/organizations/acme-corp/registries/awesome-gem/packages",
             ],
             capture_output=True,
@@ -141,8 +141,6 @@ class PackagePublisherTests(unittest.TestCase):
 
         pp = PackagePublisher(registry="acme-corp/awesome-gem")
 
-        result = pp.upload_package(
-            file_path="/example/file.gem", provenance_bundle_path=""
-        )
+        result = pp.upload_package(file_path="/example/file.gem")
 
         self.assertEqual(result, dict(field_1="value_1", field_2="value_2"))

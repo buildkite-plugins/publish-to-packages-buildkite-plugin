@@ -4,10 +4,13 @@ from typing import Any
 
 
 class PackagePublisher:
-    def __init__(self, registry: str) -> None:
+    def __init__(
+        self, registry: str, attestation_bundle_path: str | None = None
+    ) -> None:
         (self.organization_slug, self.registry_slug) = registry.split("/")
+        self.attestation_bundle_path = attestation_bundle_path
 
-    def upload_package(self, file_path: str, provenance_bundle_path: str) -> Any:
+    def upload_package(self, file_path: str) -> Any:
         url = "https://api.buildkite.com/v2/packages/organizations/{}/registries/{}/packages".format(
             self.organization_slug, self.registry_slug
         )
@@ -20,8 +23,11 @@ class PackagePublisher:
         ]
         command += ["--form", "file=@{}".format(file_path)]
         command += (
-            ["--form", "provenance_bundle=@{}".format(provenance_bundle_path)]
-            if provenance_bundle_path != ""
+            [
+                "--form",
+                "attestation_bundle=@{}".format(self.attestation_bundle_path),
+            ]
+            if self.attestation_bundle_path is not None
             else []
         )
         command += [url]

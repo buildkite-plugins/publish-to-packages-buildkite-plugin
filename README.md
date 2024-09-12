@@ -1,8 +1,36 @@
 # Publish to Packages [![Build status](https://badge.buildkite.com/8dff045aea2a2227a4387e77941af1177230066dc459982c67.svg)](https://buildkite.com/buildkite/plugins-publish-to-packages)
 
-A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that publishes [build artifacts](https://buildkite.com/docs/pipelines/artifacts) to [Buildkite Packages](https://buildkite.com/packages).
+A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that publishes [build artifacts](https://buildkite.com/docs/pipelines/artifacts) and attestations to [Buildkite Packages](https://buildkite.com/packages).
 
 This plugin authenticates with Buildkite Packages using an [Agent OIDC token](https://buildkite.com/docs/agent/v3/cli-oidc), so your registry needs to be configured with a suitable [OIDC policy](https://buildkite.com/docs/packages/security/oidc#define-an-oidc-policy-for-a-registry).
+
+## Quick Start
+
+### Minimal
+
+```yaml
+steps:
+  - label: "Publish Gem"
+    plugins:
+      - publish-to-packages#v2.0.0:
+          artifacts: "awesome-logger-*.gem"
+          registry: "acme-corp/awesome-logger"
+```
+
+### The Works
+
+```yaml
+steps:
+  - label: "Publish Gem"
+    plugins:
+      - publish-to-packages#v2.0.0:
+          artifacts: "awesome-logger-*.gem"
+          registry: "acme-corp/awesome-logger"
+          attestations: # optional
+            - "gem-build.attestation.json"
+            - "gem-package.attestation.json"
+          artifact_build_id: "${BUILDKITE_TRIGGERED_FROM_BUILD_ID}" # optional
+```
 
 ## Options
 
@@ -16,6 +44,14 @@ Buildkite Packages registry to publish to.
 
 - Full format is `<organization>/<registry_name>` (e.g. `acme-corp/awesome-logger`).
 - `<organization>` defaults to your Buildkite organization if omitted (e.g. `awesome-logger`).
+
+#### `attestations` (string or list of strings, optional)
+
+One or more attestations from artifact storage to publish along with each package created from `artifacts`.
+
+Each attestation file must be a valid JSON object. You can use [Generate Build Provenance](https://github.com/buildkite-plugins/generate-build-provenance-buildkite-plugin) plugin to generate a valid build provenance attestation in your Buildkite pipeline.
+
+If `artifact_build_id` is specified, attestations will be downloaded from the relevant build artifact storage.
 
 #### `artifact_build_id` (string, optional)
 
@@ -89,4 +125,26 @@ steps:
           artifacts: "awesome-logger-*.gem"
           registry: "acme-corp/awesome-logger"
           artifact_build_id: "${BUILDKITE_TRIGGERED_FROM_BUILD_ID}"
+```
+
+### Building and publishing with build provenance attestation
+
+```yaml
+steps:
+  - label: "Build Gem"
+    key: "build-gem"
+    command: "gem build awesome-logger.gemspec"
+    artifact_paths: "awesome-logger-*.gem" # upload to build artifact storage
+    plugins:
+      - generate-build-provenance#v3.0.0:
+          artifacts: "awesome-logger-*.gem" # publish from build artifact storage
+          attestation_name: "gem-build.attestation.json"
+
+  - label: "Publish Gem"
+    depends_on: "build-gem"
+    plugins:
+      - publish-to-packages#v2.0.0:
+          artifacts: "awesome-logger-*.gem" # publish from build artifact storage
+          registry: "acme-corp/awesome-logger"
+          attestations: "gem-build.attestation.json"
 ```

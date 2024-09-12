@@ -19,13 +19,13 @@ SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 ARTIFACTS="$(plugin_read_config ARTIFACTS "")"
 REGISTRY="$(plugin_read_config REGISTRY "")"
 ARTIFACT_BUILD_ID="$(plugin_read_config ARTIFACT_BUILD_ID "")"
-PROVENANCE_BUNDLE="$(plugin_read_config PROVENANCE_BUNDLE "")"
+ATTESTATIONS="$(plugin_read_list ATTESTATIONS "")"
 
 TMP_DIR=$(mktemp -d)
 ARTIFACTS_DIR="${TMP_DIR}/artifacts"
-PROVENANCE_DIR="${TMP_DIR}/provenance"
+ATTESTATIONS_DIR="${TMP_DIR}/attestations"
 
-mkdir -p "${ARTIFACTS_DIR}" "${PROVENANCE_DIR}"
+mkdir -p "${ARTIFACTS_DIR}" "${ATTESTATIONS_DIR}"
 
 echo "~~~ 🚚 Download artifacts"
 
@@ -39,23 +39,19 @@ fi
 # shellcheck disable=SC2086
 buildkite-agent artifact download ${ARTIFACTS} ${ARTIFACTS_DIR} ${BUILD_OPTION}
 
-if [ "${PROVENANCE_BUNDLE}" != "" ]; then
-  # shellcheck disable=SC2086
-  buildkite-agent artifact download ${PROVENANCE_BUNDLE} ${PROVENANCE_DIR} ${BUILD_OPTION}
+if [ "${ATTESTATIONS}" != "" ]; then
+  for FILE in $ATTESTATIONS; do
+    # shellcheck disable=SC2086
+    buildkite-agent artifact download ${FILE} ${ATTESTATIONS_DIR} ${BUILD_OPTION}
+  done
 fi
 
 echo "+++ 🚚 Publishing to Packages"
 
-if [ "${PROVENANCE_BUNDLE}" != "" ]; then
-  PROVENANCE_BUNDLE_PATH="${PROVENANCE_DIR}/${PROVENANCE_BUNDLE}"
-else
-  PROVENANCE_BUNDLE_PATH=""
-fi
-
 python3 "${SCRIPT_DIR}/../main.py" \
   --artifacts-dir "${ARTIFACTS_DIR}" \
+  --attestations-dir "${ATTESTATIONS_DIR}" \
   --registry "${REGISTRY}" \
-  --provenance-bundle "${PROVENANCE_BUNDLE_PATH}" \
   --organization-slug "${BUILDKITE_ORGANIZATION_SLUG}"
 
 echo "~~~ 🚚 Clean up Publish to Packages"
