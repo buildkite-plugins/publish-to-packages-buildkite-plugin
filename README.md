@@ -1,4 +1,4 @@
-# Publish to Packages
+# Publish to Packages [![Build status](https://badge.buildkite.com/8dff045aea2a2227a4387e77941af1177230066dc459982c67.svg)](https://buildkite.com/buildkite/plugins-publish-to-packages)
 
 A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that publishes [build artifacts](https://buildkite.com/docs/pipelines/artifacts) to [Buildkite Packages](https://buildkite.com/packages).
 
