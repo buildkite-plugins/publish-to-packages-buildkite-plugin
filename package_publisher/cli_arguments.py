@@ -10,7 +10,7 @@ class CliArguments:
         )
         parser.add_argument("--registry", default="")
         parser.add_argument("--artifacts-dir", default="")
-        parser.add_argument("--provenance-bundle", default="")
+        parser.add_argument("--attestations-dir", default="")
         parser.add_argument("--organization-slug", default="")
 
         self.arguments = parser.parse_args()
@@ -24,8 +24,8 @@ class CliArguments:
     def get_artifacts_dir(self) -> str:
         return str(self.arguments.artifacts_dir).strip()
 
-    def get_provenance_bundle(self) -> str:
-        return str(self.arguments.provenance_bundle).strip()
+    def get_attestations_dir(self) -> str:
+        return str(self.arguments.attestations_dir).strip()
 
     def get_organization_slug(self) -> str:
         return str(self.arguments.organization_slug).strip()
