@@ -1,11 +1,11 @@
 import json
 import subprocess
-from typing import Any
+from typing import Any, Optional
 
 
 class PackagePublisher:
     def __init__(
-        self, registry: str, attestation_bundle_path: str | None = None
+        self, registry: str, attestation_bundle_path: Optional[str] = None
     ) -> None:
         (self.organization_slug, self.registry_slug) = registry.split("/")
         self.attestation_bundle_path = attestation_bundle_path

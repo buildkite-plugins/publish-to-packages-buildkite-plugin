@@ -1,9 +1,10 @@
 import json
 
 from tempfile import NamedTemporaryFile
+from typing import Optional
 
 
-def attestations_to_bundle(file_paths: list[str]) -> str | None:
+def attestations_to_bundle(file_paths: list[str]) -> Optional[str]:
     if len(file_paths) <= 0:
         return None
 
