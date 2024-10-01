@@ -12,7 +12,7 @@ This plugin authenticates with Buildkite Packages using an [Agent OIDC token](ht
 steps:
   - label: "Publish Gem"
     plugins:
-      - publish-to-packages#v2.1.0:
+      - publish-to-packages#v2.2.0:
           artifacts: "awesome-logger-*.gem"
           registry: "acme-corp/awesome-logger"
 ```
@@ -23,7 +23,7 @@ steps:
 steps:
   - label: "Publish Gem"
     plugins:
-      - publish-to-packages#v2.1.0:
+      - publish-to-packages#v2.2.0:
           artifacts: "awesome-logger-*.gem"
           registry: "acme-corp/awesome-logger"
           attestations: # optional
@@ -81,7 +81,7 @@ steps:
   - label: "Publish Gem"
     depends_on: "build-gem"
     plugins:
-      - publish-to-packages#v2.1.0:
+      - publish-to-packages#v2.2.0:
           artifacts: "awesome-logger-*.gem" # publish from build artifact storage
           registry: "acme-corp/awesome-logger"
 ```
@@ -121,7 +121,7 @@ steps:
 steps:
   - label: "Publish Gem"
     plugins:
-      - publish-to-packages#v2.1.0:
+      - publish-to-packages#v2.2.0:
           artifacts: "awesome-logger-*.gem"
           registry: "acme-corp/awesome-logger"
           artifact_build_id: "${BUILDKITE_TRIGGERED_FROM_BUILD_ID}"
@@ -143,7 +143,7 @@ steps:
   - label: "Publish Gem"
     depends_on: "build-gem"
     plugins:
-      - publish-to-packages#v2.1.0:
+      - publish-to-packages#v2.2.0:
           artifacts: "awesome-logger-*.gem" # publish from build artifact storage
           registry: "acme-corp/awesome-logger"
           attestations: "gem-build.attestation.json"

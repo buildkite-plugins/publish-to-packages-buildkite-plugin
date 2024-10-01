@@ -8,11 +8,22 @@ steps:
           entrypoint: "" # Override: https://github.com/cytopia/docker-mypy/blob/f33fba854ea69a4fd102a044242c2a3c8efac6e3/Dockerfiles/Dockerfile.python3.10#L51
           shell: ["/bin/sh", "-e", "-c"] # Restore default from setting `entrypoint:` above.
 
-  - label: ":python: Unit tests"
-    command: "python3 -m unittest tests/*.py"
-    plugins:
-      - docker#v5.11.0:
-          image: "python:3.10-alpine"
+  - group: ":python: Unit tests"
+    steps:
+      - name: ":python: Unit Test (Python {{matrix.python_version}})"
+        command: "python3 -m unittest tests/*.py"
+        plugins:
+          - docker#v5.11.0:
+              image: "python:{{matrix.python_version}}-alpine"
+        matrix:
+          setup:
+            python_version:
+              - "3.9"
+              - "3.10"
+              - "3.11"
+              - "3.12"
+              - "3.13-rc"
+
   - label: ":sparkles: Lint"
     plugins:
       - plugin-linter#v3.3.0:
