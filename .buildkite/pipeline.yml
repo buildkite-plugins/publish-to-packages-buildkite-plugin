@@ -2,7 +2,7 @@ steps:
   - label: ":python: Type check"
     command: "mypy --strict ."
     plugins:
-      - docker#v5.11.0:
+      - docker#v5.12.0:
           image: "cytopia/mypy:latest-py3.10" # https://hub.docker.com/r/cytopia/mypy
           workdir: "/data" # Expected by image: https://github.com/cytopia/docker-mypy/blob/f33fba854ea69a4fd102a044242c2a3c8efac6e3/Dockerfiles/Dockerfile.python3.10#L50
           entrypoint: "" # Override: https://github.com/cytopia/docker-mypy/blob/f33fba854ea69a4fd102a044242c2a3c8efac6e3/Dockerfiles/Dockerfile.python3.10#L51
@@ -13,7 +13,7 @@ steps:
       - name: ":python: Unit Test (Python {{matrix.python_version}})"
         command: "python3 -m unittest tests/*.py"
         plugins:
-          - docker#v5.11.0:
+          - docker#v5.12.0:
               image: "python:{{matrix.python_version}}-alpine"
         matrix:
           setup:
