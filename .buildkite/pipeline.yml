@@ -26,7 +26,7 @@ steps:
 
   - label: ":sparkles: Lint"
     plugins:
-      - plugin-linter#v3.3.0:
+      - plugin-linter#v4.1.0:
           id: publish-to-packages
 
   - label: ":shell: Shellcheck"
